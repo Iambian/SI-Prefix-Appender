@@ -24,7 +24,9 @@ If it doesn't work, try a different program. If none of them runs error-free,
 something is wrong that I can't help you with.
 
 **Change to eng mode** to activate the hook features. Do this from the help/mode
-menu.
+menu. See image below. Your mode menu may look something like this.
+![What the heck is eng mode?](explain1.png "What the heck is eng mode?")
+
 
 License
 -------
