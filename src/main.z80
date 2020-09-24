@@ -1,0 +1,133 @@
+;===============================================================================
+;Hook for replacing ENG mode exponents with SI unit suffixes on results printout
+;===============================================================================
+;
+#ifdef 83p
+#include "src/inc/ti83plus.inc"
+#define asmHeadTok t2ByteTok
+#define asmProgTok tasmCmp
+#define syscall(x) bcall(x)
+#define hookInstallTo appbackupscreen+600
+#define _EnableHSHook $4FAB
+#define _CreateTempStrng $4324
+#endif
+;
+#ifdef 84p
+#include "src/inc/ti84plus.inc"
+#define asmHeadTok tExtTok
+#define asmProgTok tAsm84CCmp
+#define syscall(x) bcall(x)
+#define hookInstallTo cmdShadow
+#define _EnableHSHook $4F90
+#define _CreateTempStrng _CreateTStrng
+#endif
+;
+#ifdef 84ce
+.assume adl=1
+#include "src/inc/ti84pce.inc"
+#define asmHeadTok tExtTok
+#define asmProgTok tAsm84CeCmp
+#define syscall(x) call x
+#define hookInstallTo (stackBot-256)
+#define _EnableHSHook _SetHomescreenHook
+#define _CreateTempStrng _CreateTStrng
+#endif
+;
+;===============================================================================
+;===============================================================================
+;===============================================================================
+.org userMem-2
+.db asmHeadTok,asmProgTok
+ProgramStart:
+	;jr $
+	res 5,(iy+44h)	;mathprint flag disabled. Hopefully doesn't break non-MP
+	ld de,hookInstallTo
+	push de
+		ld hl,HomescreenHook
+		ld bc,HomescreenHookEnd-HomescreenHook
+		ldir
+	pop hl
+	ld a,$81
+	syscall(_EnableHSHook)
+	syscall(_ClrLCDFull)
+	syscall(_HomeUp)
+	ret
+
+
+HomescreenHook:
+.db 83h
+	or a
+	jr nz,HomescreenHookFinish
+	;verify that we can hook into
+	ld a,(Op1)
+	or a
+	jr nz,HomescreenHookFinish
+	ld a,(iy+fmtFlags)
+	bit fmtEng,a
+	jr z,HomescreenHookFinish
+	ld (iy+fmtOverride),a
+	;create string
+	ld a,(Op1+1)   ;exponent
+	push af
+		ld a,10  ;maxdigits
+		syscall(_FormReal)
+		ld hl,Op3
+		xor a
+		push hl
+			cp (hl)
+			inc hl
+			jr nz,$-2
+			dec hl
+			ex de,hl	;writeto in DE
+		pop hl
+	pop af				;exponent
+	sub $68
+	jr c,HomescreenHookFinish
+	cp $98-$68
+	jr nc,HomescreenHookFinish
+	push hl
+		or a
+		sbc hl,hl
+		ld L,a
+		ld a,3
+		syscall(_DivHLbyA)
+		ld bc,hookInstallTo+(HomescreenHookPrefixTable-HomescreenHook)
+		add hl,bc
+		ex de,hl
+		ld (hl),$C1 ;'['
+		inc hl
+		ld a,(de)
+		ld (hl),a
+		inc hl
+		ld (hl),']'
+		inc hl
+		ld (hl),$00
+	pop hl
+	syscall(_PutS)
+	syscall(_NewLine)
+	xor a
+	inc a
+	ret
+HomescreenHookFinish:
+	xor a
+	ret
+	
+	
+HomescreenHookPrefixTable:
+.db "yzafpn",$C3,"m kMGTPEZY" ;17
+	
+HomescreenHookEnd:
+
+
+
+
+
+
+
+
+
+
+
+
+.echo "Program size; ",$-ProgramStart,", hook size: ",$-HomescreenHook
+
