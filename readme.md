@@ -4,6 +4,10 @@ SI Prefix Appender
 Because Tim wanted his calculations to have the associated SI prefixes (e.g.
 'm' for milli, 'k' for kilo, etc.)
 
+![Example for monochrome calcs](example1.png "Example for monochrome calcs")
+![Example for color calcs](example2.png "Example for color calcs")
+
+
 Program and Corresponding Supported Platforms
 ---------------------------------------------
 * `SIHK83P.8XP` TI-83+(SE) / TI-84+(SE)
