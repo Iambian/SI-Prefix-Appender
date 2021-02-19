@@ -19,7 +19,7 @@ Using
 **Mathprint**, if your calculator has it, **should be disabled**. The installer 
 will turn it off for you on the CE, but it is untested on the 83+/84+CSE.
 
-**Send** the appropriate program **to calculator, then run it** as an Asm( program.
+**Send** the appropriate program **to the calculator, then run it** as an `Asm(` program.
 If it doesn't work, try a different program. If none of them runs error-free,
 something is wrong that I can't help you with.
 
@@ -30,7 +30,7 @@ menu. See image below. Your mode menu may look something like this.
 
 License
 -------
-Do whatever.
+MIT License, as found in the LICENSE file.
 
 Credits
 -------
